@@ -36,14 +36,10 @@ class TransformationTest
   val bucketSize: Int = 2
   val addressPrefixLength: Int = 5
 
-  // transformation pipeline
-  val t = new Transformation(spark, bucketSize, addressPrefixLength)
-
   // input data
   val blocks = readTestData[Block](spark, inputDir + "test_blocks.json")
-  val transactions = t.addCoinbaseAddress(
+  val transactions =
     readTestData[Transaction](spark, inputDir + "test_txs.json")
-  )
   val exchangeRatesRaw =
     readTestData[ExchangeRatesRaw](spark, inputDir + "test_exchange_rates.json")
 
@@ -54,6 +50,9 @@ class TransformationTest
     .first()
     .getInt(0)
   val noTransactions = transactions.count()
+
+  // transformation pipeline
+  val t = new Transformation(spark, bucketSize, addressPrefixLength)
 
   val exchangeRates =
     t.computeExchangeRates(blocks, exchangeRatesRaw)
@@ -275,10 +274,9 @@ class TransformationTest
   }
   test("clusterRelations") {
     val clusterRelationsRef =
-      readTestData[ClusterRelationAdj](spark, refDir + "cluster_relations.json")
+      readTestData[ClusterRelation](spark, refDir + "cluster_relations.json")
         .sort(F.srcClusterId, F.dstClusterId)
-    val sortedRelations =
-      clusterRelations.sort(F.srcClusterId, F.dstClusterId)
+    val sortedRelations = clusterRelations.sort(F.srcClusterId, F.dstClusterId)
     assertDataFrameEquality(sortedRelations, clusterRelationsRef)
   }
   test("clusters") {

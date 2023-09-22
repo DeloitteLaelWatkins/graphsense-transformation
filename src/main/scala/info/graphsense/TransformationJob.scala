@@ -90,17 +90,16 @@ object TransformationJob {
     import spark.implicits._
 
     val cassandra = new CassandraStorage(spark)
-    val transformation =
-      new Transformation(spark, conf.bucketSize(), conf.addressPrefixLength())
 
     val exchangeRatesRaw =
       cassandra.load[ExchangeRatesRaw](conf.rawKeyspace(), "exchange_rates")
     val blocks =
       cassandra.load[Block](conf.rawKeyspace(), "block").persist()
     val transactions =
-      transformation.addCoinbaseAddress(
-        cassandra.load[Transaction](conf.rawKeyspace(), "transaction")
-      )
+      cassandra.load[Transaction](conf.rawKeyspace(), "transaction")
+
+    val transformation =
+      new Transformation(spark, conf.bucketSize(), conf.addressPrefixLength())
 
     println("Store configuration")
     val configuration =
@@ -311,26 +310,20 @@ object TransformationJob {
     cassandra.store(
       conf.targetKeyspace(),
       "cluster_incoming_relations",
-      clusterRelations
-        .drop(F.estimatedValueAdj)
-        .as[ClusterRelation]
-        .sort(
-          F.dstClusterIdGroup,
-          F.dstClusterId,
-          F.srcClusterId
-        )
+      clusterRelations.sort(
+        F.dstClusterIdGroup,
+        F.dstClusterId,
+        F.srcClusterId
+      )
     )
     cassandra.store(
       conf.targetKeyspace(),
       "cluster_outgoing_relations",
-      clusterRelations
-        .drop(F.estimatedValueAdj)
-        .as[ClusterRelation]
-        .sort(
-          F.srcClusterIdGroup,
-          F.srcClusterId,
-          F.dstClusterId
-        )
+      clusterRelations.sort(
+        F.srcClusterIdGroup,
+        F.srcClusterId,
+        F.dstClusterId
+      )
     )
 
     println("Computing cluster")

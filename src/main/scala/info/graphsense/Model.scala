@@ -164,8 +164,6 @@ case class Cluster(
     lastTxId: Long,
     totalReceived: Currency,
     totalSpent: Currency,
-    totalReceivedAdj: Currency,
-    totalSpentAdj: Currency,
     inDegree: Int,
     outDegree: Int
 )
@@ -202,16 +200,6 @@ case class ClusterRelation(
     dstClusterId: Int,
     noTransactions: Int,
     estimatedValue: Currency
-)
-
-case class ClusterRelationAdj(
-    srcClusterIdGroup: Int,
-    srcClusterId: Int,
-    dstClusterIdGroup: Int,
-    dstClusterId: Int,
-    noTransactions: Int,
-    estimatedValue: Currency,
-    estimatedValueAdj: Currency
 )
 
 case class SummaryStatistics(

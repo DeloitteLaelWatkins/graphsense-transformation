@@ -10,14 +10,14 @@ import org.apache.spark.sql.functions.{
   explode,
   floor,
   lead,
-  lit,
   round,
   row_number,
   struct,
   substring,
   sum,
   transform,
-  when
+  when,
+  lit
 }
 import org.apache.spark.sql.types.{FloatType, IntegerType, LongType}
 import org.graphframes.GraphFrame
@@ -332,24 +332,6 @@ class Transformator(spark: SparkSession, bucketSize: Int) extends Serializable {
       .agg(
         count(F.txId).cast(IntegerType).as(F.noTransactions),
         struct(
-          sum(
-            when(
-              col(F.srcClusterId) =!= col(F.dstClusterId),
-              col(F.estimatedValue)
-            )
-          ).as(F.value),
-          array(
-            (0 until noFiatCurrencies)
-              .map(i =>
-                sum(
-                  when(
-                    col(F.srcClusterId) =!= col(F.dstClusterId),
-                    col(F.fiatValues).getItem(i)
-                  )).cast(FloatType)
-              ): _*
-          ).as(F.fiatValues)
-        ).as(F.estimatedValueAdj),
-        struct(
           sum(col(F.estimatedValue)).as(F.value),
           array(
             (0 until noFiatCurrencies)
@@ -361,6 +343,6 @@ class Transformator(spark: SparkSession, bucketSize: Int) extends Serializable {
       .transform(withIdGroup(F.srcClusterId, F.srcClusterIdGroup))
       // add partitioning columns for incoming clusters
       .transform(withIdGroup(F.dstClusterId, F.dstClusterIdGroup))
-      .as[ClusterRelationAdj]
+      .as[ClusterRelation]
   }
 }

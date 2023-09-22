@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # default values
-MEMORY="4g"
+MEMORY="1g"
 SPARK_MASTER="local[*]"
 CASSANDRA_HOST="localhost"
 
@@ -22,8 +22,8 @@ EXEC=$(basename "$0")
 USAGE="Usage: $EXEC [-h] [-m MEMORY_GB] [-c CASSANDRA_HOST] [-s SPARK_MASTER] [--currency CURRENCY] [--raw_keyspace RAW_KEYSPACE] [--tgt_keyspace TGT_KEYSPACE] [--bucket_size BUCKET_SIZE] [--bech32-prefix BECH32_PREFIX] [--checkpoint-dir CHECKPOINT_DIR] [--coinjoin-filtering]"
 
 # parse command line options
-args=$(getopt -o hc:m:s: --long raw_keyspace:,tgt_keyspace:,bucket_size:,currency:,bech32_prefix:,checkpoint_dir,coinjoin_filtering: -- "$@")
-eval set -- "$args"
+#args=$(getopt -o hc:m:s: --long raw_keyspace:,tgt_keyspace:,bucket_size:,currency:,bech32_prefix:,checkpoint_dir,coinjoin_filtering: -- "$@")
+#eval set -- "$args"
 
 while true; do
     case "$1" in
